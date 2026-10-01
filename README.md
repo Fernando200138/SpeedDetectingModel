@@ -14,6 +14,8 @@ A fun, real-time application that detects your upper-body pose and facial expres
 
 ## Setup
 
+Use Python 3.9–3.12 for MediaPipe 0.10.21. The application uses the legacy `mp.solutions` API, which is not available in MediaPipe 1.x.
+
 ### 1. Clone/Create the Project
 
 ```bash

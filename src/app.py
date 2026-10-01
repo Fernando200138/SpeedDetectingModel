@@ -58,7 +58,7 @@ def main():
                     pass
         return 0
 
-    cam_index = _find_working_cam(3)
+    cam_index = _find_working_cam(0)
     print(f"[INFO] Initializing MediaPipe capture on camera index {cam_index}...")
     capture = MediaPipeCapture(cam_index=cam_index, webcam_width=1280, webcam_height=720)
 

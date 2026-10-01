@@ -1,0 +1,492 @@
+{
+  "coordinate_notes": {
+    "x_y": "Normalized image coordinates in [0, 1]; multiply by image width or height for pixels.",
+    "z": "Relative depth estimate in image-landmark coordinates; not centimeters.",
+    "world_landmarks_meters": "MediaPipe's hand-centered 3D coordinates in meters, when available."
+  },
+  "connections": [
+    {
+      "start_id": 0,
+      "start_name": "wrist",
+      "end_id": 1,
+      "end_name": "thumb_cmc"
+    },
+    {
+      "start_id": 0,
+      "start_name": "wrist",
+      "end_id": 5,
+      "end_name": "index_finger_mcp"
+    },
+    {
+      "start_id": 0,
+      "start_name": "wrist",
+      "end_id": 17,
+      "end_name": "pinky_mcp"
+    },
+    {
+      "start_id": 1,
+      "start_name": "thumb_cmc",
+      "end_id": 2,
+      "end_name": "thumb_mcp"
+    },
+    {
+      "start_id": 2,
+      "start_name": "thumb_mcp",
+      "end_id": 3,
+      "end_name": "thumb_ip"
+    },
+    {
+      "start_id": 3,
+      "start_name": "thumb_ip",
+      "end_id": 4,
+      "end_name": "thumb_tip"
+    },
+    {
+      "start_id": 5,
+      "start_name": "index_finger_mcp",
+      "end_id": 6,
+      "end_name": "index_finger_pip"
+    },
+    {
+      "start_id": 5,
+      "start_name": "index_finger_mcp",
+      "end_id": 9,
+      "end_name": "middle_finger_mcp"
+    },
+    {
+      "start_id": 6,
+      "start_name": "index_finger_pip",
+      "end_id": 7,
+      "end_name": "index_finger_dip"
+    },
+    {
+      "start_id": 7,
+      "start_name": "index_finger_dip",
+      "end_id": 8,
+      "end_name": "index_finger_tip"
+    },
+    {
+      "start_id": 9,
+      "start_name": "middle_finger_mcp",
+      "end_id": 10,
+      "end_name": "middle_finger_pip"
+    },
+    {
+      "start_id": 9,
+      "start_name": "middle_finger_mcp",
+      "end_id": 13,
+      "end_name": "ring_finger_mcp"
+    },
+    {
+      "start_id": 10,
+      "start_name": "middle_finger_pip",
+      "end_id": 11,
+      "end_name": "middle_finger_dip"
+    },
+    {
+      "start_id": 11,
+      "start_name": "middle_finger_dip",
+      "end_id": 12,
+      "end_name": "middle_finger_tip"
+    },
+    {
+      "start_id": 13,
+      "start_name": "ring_finger_mcp",
+      "end_id": 14,
+      "end_name": "ring_finger_pip"
+    },
+    {
+      "start_id": 13,
+      "start_name": "ring_finger_mcp",
+      "end_id": 17,
+      "end_name": "pinky_mcp"
+    },
+    {
+      "start_id": 14,
+      "start_name": "ring_finger_pip",
+      "end_id": 15,
+      "end_name": "ring_finger_dip"
+    },
+    {
+      "start_id": 15,
+      "start_name": "ring_finger_dip",
+      "end_id": 16,
+      "end_name": "ring_finger_tip"
+    },
+    {
+      "start_id": 17,
+      "start_name": "pinky_mcp",
+      "end_id": 18,
+      "end_name": "pinky_pip"
+    },
+    {
+      "start_id": 18,
+      "start_name": "pinky_pip",
+      "end_id": 19,
+      "end_name": "pinky_dip"
+    },
+    {
+      "start_id": 19,
+      "start_name": "pinky_dip",
+      "end_id": 20,
+      "end_name": "pinky_tip"
+    }
+  ],
+  "hands": [
+    {
+      "label": "Right",
+      "score": 0.9964262247085571,
+      "landmarks": [
+        {
+          "id": 0,
+          "name": "wrist",
+          "x": 0.6497676372528076,
+          "y": 0.7012630105018616,
+          "pixel_x": 2495,
+          "pixel_y": 1515
+        },
+        {
+          "id": 1,
+          "name": "thumb_cmc",
+          "x": 0.6879613995552063,
+          "y": 0.6615752577781677,
+          "pixel_x": 2642,
+          "pixel_y": 1429
+        },
+        {
+          "id": 2,
+          "name": "thumb_mcp",
+          "x": 0.7135862708091736,
+          "y": 0.6172792911529541,
+          "pixel_x": 2740,
+          "pixel_y": 1333
+        },
+        {
+          "id": 3,
+          "name": "thumb_ip",
+          "x": 0.7404966354370117,
+          "y": 0.5779707431793213,
+          "pixel_x": 2844,
+          "pixel_y": 1248
+        },
+        {
+          "id": 4,
+          "name": "thumb_tip",
+          "x": 0.7652710676193237,
+          "y": 0.5682851076126099,
+          "pixel_x": 2939,
+          "pixel_y": 1227
+        },
+        {
+          "id": 5,
+          "name": "index_finger_mcp",
+          "x": 0.6790558695793152,
+          "y": 0.527550995349884,
+          "pixel_x": 2608,
+          "pixel_y": 1140
+        },
+        {
+          "id": 6,
+          "name": "index_finger_pip",
+          "x": 0.6810696721076965,
+          "y": 0.5101064443588257,
+          "pixel_x": 2615,
+          "pixel_y": 1102
+        },
+        {
+          "id": 7,
+          "name": "index_finger_dip",
+          "x": 0.682171106338501,
+          "y": 0.5414347052574158,
+          "pixel_x": 2620,
+          "pixel_y": 1169
+        },
+        {
+          "id": 8,
+          "name": "index_finger_tip",
+          "x": 0.6821085810661316,
+          "y": 0.5673410296440125,
+          "pixel_x": 2619,
+          "pixel_y": 1225
+        },
+        {
+          "id": 9,
+          "name": "middle_finger_mcp",
+          "x": 0.6502147316932678,
+          "y": 0.5272224545478821,
+          "pixel_x": 2497,
+          "pixel_y": 1139
+        },
+        {
+          "id": 10,
+          "name": "middle_finger_pip",
+          "x": 0.6596600413322449,
+          "y": 0.5226194858551025,
+          "pixel_x": 2533,
+          "pixel_y": 1129
+        },
+        {
+          "id": 11,
+          "name": "middle_finger_dip",
+          "x": 0.6620780229568481,
+          "y": 0.5532594919204712,
+          "pixel_x": 2542,
+          "pixel_y": 1195
+        },
+        {
+          "id": 12,
+          "name": "middle_finger_tip",
+          "x": 0.6619138717651367,
+          "y": 0.577868640422821,
+          "pixel_x": 2542,
+          "pixel_y": 1248
+        },
+        {
+          "id": 13,
+          "name": "ring_finger_mcp",
+          "x": 0.625917911529541,
+          "y": 0.540668249130249,
+          "pixel_x": 2404,
+          "pixel_y": 1168
+        },
+        {
+          "id": 14,
+          "name": "ring_finger_pip",
+          "x": 0.6390272378921509,
+          "y": 0.53304523229599,
+          "pixel_x": 2454,
+          "pixel_y": 1151
+        },
+        {
+          "id": 15,
+          "name": "ring_finger_dip",
+          "x": 0.6424651145935059,
+          "y": 0.5574046969413757,
+          "pixel_x": 2467,
+          "pixel_y": 1204
+        },
+        {
+          "id": 16,
+          "name": "ring_finger_tip",
+          "x": 0.6423458456993103,
+          "y": 0.5841965079307556,
+          "pixel_x": 2467,
+          "pixel_y": 1262
+        },
+        {
+          "id": 17,
+          "name": "pinky_mcp",
+          "x": 0.6062973737716675,
+          "y": 0.5560355186462402,
+          "pixel_x": 2328,
+          "pixel_y": 1201
+        },
+        {
+          "id": 18,
+          "name": "pinky_pip",
+          "x": 0.6177995204925537,
+          "y": 0.5439474582672119,
+          "pixel_x": 2372,
+          "pixel_y": 1175
+        },
+        {
+          "id": 19,
+          "name": "pinky_dip",
+          "x": 0.6219534277915955,
+          "y": 0.5643273591995239,
+          "pixel_x": 2388,
+          "pixel_y": 1219
+        },
+        {
+          "id": 20,
+          "name": "pinky_tip",
+          "x": 0.6228232979774475,
+          "y": 0.5858034491539001,
+          "pixel_x": 2392,
+          "pixel_y": 1265
+        }
+      ],
+      "world_landmarks_meters": [
+        {
+          "id": 0,
+          "name": "wrist",
+          "x": 0.0017855940386652946,
+          "y": 0.0636337548494339
+        },
+        {
+          "id": 1,
+          "name": "thumb_cmc",
+          "x": 0.030197102576494217,
+          "y": 0.05464620143175125
+        },
+        {
+          "id": 2,
+          "name": "thumb_mcp",
+          "x": 0.053611114621162415,
+          "y": 0.03618151322007179
+        },
+        {
+          "id": 3,
+          "name": "thumb_ip",
+          "x": 0.07521543651819229,
+          "y": 0.019832178950309753
+        },
+        {
+          "id": 4,
+          "name": "thumb_tip",
+          "x": 0.09403400123119354,
+          "y": 0.004517398774623871
+        },
+        {
+          "id": 5,
+          "name": "index_finger_mcp",
+          "x": 0.02393569052219391,
+          "y": -0.0008374005556106567
+        },
+        {
+          "id": 6,
+          "name": "index_finger_pip",
+          "x": 0.026741517707705498,
+          "y": -0.008148135617375374
+        },
+        {
+          "id": 7,
+          "name": "index_finger_dip",
+          "x": 0.026435669511556625,
+          "y": -0.007507705129683018
+        },
+        {
+          "id": 8,
+          "name": "index_finger_tip",
+          "x": 0.023946188390254974,
+          "y": 0.0006324197165668011
+        },
+        {
+          "id": 9,
+          "name": "middle_finger_mcp",
+          "x": 0.00062007230008021,
+          "y": -0.0019655840005725622
+        },
+        {
+          "id": 10,
+          "name": "middle_finger_pip",
+          "x": 0.005514811724424362,
+          "y": -0.01611870341002941
+        },
+        {
+          "id": 11,
+          "name": "middle_finger_dip",
+          "x": 0.009346055798232555,
+          "y": -0.0020519718527793884
+        },
+        {
+          "id": 12,
+          "name": "middle_finger_tip",
+          "x": 0.010192356072366238,
+          "y": 0.0026229852810502052
+        },
+        {
+          "id": 13,
+          "name": "ring_finger_mcp",
+          "x": -0.017734574154019356,
+          "y": -0.001399074331857264
+        },
+        {
+          "id": 14,
+          "name": "ring_finger_pip",
+          "x": -0.010082037188112736,
+          "y": -0.0073777721263468266
+        },
+        {
+          "id": 15,
+          "name": "ring_finger_dip",
+          "x": -0.004477142356336117,
+          "y": 0.0031141899526119232
+        },
+        {
+          "id": 16,
+          "name": "ring_finger_tip",
+          "x": -0.0030336249619722366,
+          "y": 0.010015103034675121
+        },
+        {
+          "id": 17,
+          "name": "pinky_mcp",
+          "x": -0.035391587764024734,
+          "y": 0.009495861828327179
+        },
+        {
+          "id": 18,
+          "name": "pinky_pip",
+          "x": -0.028444454073905945,
+          "y": -0.0011190229561179876
+        },
+        {
+          "id": 19,
+          "name": "pinky_dip",
+          "x": -0.022964775562286377,
+          "y": 0.004373109899461269
+        },
+        {
+          "id": 20,
+          "name": "pinky_tip",
+          "x": -0.02180738002061844,
+          "y": 0.0160922110080719
+        }
+      ],
+      "features": {
+        "coordinate_space": "image_pixels_2d",
+        "finger_extended": {
+          "index_extended": [
+            true,
+            true,
+            15.174105400729717,
+            176.17766650820948
+          ],
+          "middle_extended": [
+            true,
+            true,
+            82.65668939109356,
+            171.3344207054483
+          ],
+          "ring_extended": [
+            true,
+            true,
+            85.97227458710137,
+            165.46181739618646
+          ],
+          "pinky_extended": [
+            true,
+            true,
+            79.32854662711127,
+            164.20045691352578
+          ],
+          "thumb_extended": [
+            true,
+            true,
+            175.21144282673956,
+            0.9112261441747893
+          ]
+        },
+        "joint_angles_degrees": {
+          "index_pip": 15.174105400729717,
+          "index_dip": 176.17766650820948,
+          "middle_pip": 82.65668939109356,
+          "middle_dip": 171.3344207054483,
+          "ring_pip": 85.97227458710137,
+          "ring_dip": 165.46181739618646,
+          "pinky_pip": 79.32854662711127,
+          "pinky_dip": 164.20045691352578,
+          "thumb_mcp": 175.21144282673956
+        },
+        "thumb_tip_to_index_mcp_over_palm_length": 0.9112261441747893,
+        "thresholds": {
+          "finger_pip_angle_min_degrees": 150.0,
+          "finger_dip_angle_min_degrees": 145.0,
+          "thumb_mcp_angle_min_degrees": 140.0,
+          "thumb_separation_min_palm_lengths": 0.75
+        }
+      }
+    }
+  ]
+}
