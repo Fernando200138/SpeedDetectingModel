@@ -1,249 +1,18 @@
-"""Live webcam preview with MediaPipe landmarks and hand gesture recognition."""
+"""CLI entry point for the live webcam gesture demo."""
 
 import argparse
-from pathlib import Path
+from queue import Empty, Queue
+from threading import Thread
 
 import cv2
-import mediapipe as mp
 import pyvirtualcam
 
-from .inspect_landmarks import extract_hand_features
-
-
-class OneShotVideoOverlay:
-    """Play a video once as a live-preview overlay after it is triggered."""
-
-    def __init__(self, video_path):
-        self.video_path = Path(video_path)
-        self.capture = None
-
-    def start(self):
-        self.stop()
-        capture = cv2.VideoCapture(str(self.video_path))
-        if not capture.isOpened():
-            capture.release()
-            raise RuntimeError(f"Could not open gesture video: {self.video_path}")
-        self.capture = capture
-
-    def stop(self):
-        if self.capture is not None:
-            self.capture.release()
-            self.capture = None
-
-    def overlay_next_frame(self, frame):
-        if self.capture is None:
-            return
-
-        success, video_frame = self.capture.read()
-        if not success:
-            self.stop()
-            return
-
-        frame_height, frame_width = frame.shape[:2]
-        video_height, video_width = video_frame.shape[:2]
-        max_width = min(480, frame_width // 2)
-        max_height = max(1, frame_height - 100)
-        scale = min(max_width / video_width, max_height / video_height)
-        panel_width = max(1, int(video_width * scale))
-        panel_height = max(1, int(video_height * scale))
-        panel = cv2.resize(video_frame, (panel_width, panel_height))
-
-        x = frame_width - panel_width - 16
-        y = 70
-        if y + panel_height > frame_height:
-            y = max(0, frame_height - panel_height)
-        frame[y:y + panel_height, x:x + panel_width] = panel
-        cv2.rectangle(
-            frame,
-            (x - 1, y - 1),
-            (x + panel_width, y + panel_height),
-            (255, 255, 255),
-            1,
-        )
-
-
-class HandGestureRecognizer:
-    """Recognize hand poses from the per-frame finger-extension features."""
-
-    def recognize(self, finger_extended):
-        if not finger_extended:
-            return None
-
-        if (
-            finger_extended.get("thumb_extended") is True
-            and all(
-                finger_extended.get(f"{finger}_extended") is False
-                for finger in ("index", "middle", "ring", "pinky")
-            )
-        ):
-            return "pointing_fist"
-
-        return None
-
-
-class LiveLandmarkCapture:
-    """Read webcam frames and detect face, pose, and hand landmarks."""
-
-    def __init__(
-        self,
-        camera_index=0,
-        width=1280,
-        height=720,
-        show_landmarks=True,
-        video_path=None,
-    ):
-        self.show_landmarks = show_landmarks
-        self.capture = cv2.VideoCapture(camera_index)
-        self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-        self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
-
-        self.pose = mp.solutions.pose.Pose(
-            static_image_mode=False,
-            model_complexity=1,
-            enable_segmentation=False,
-            min_detection_confidence=0.5,
-            min_tracking_confidence=0.5,
-        )
-        self.face_mesh = mp.solutions.face_mesh.FaceMesh(
-            static_image_mode=False,
-            max_num_faces=1,
-            refine_landmarks=True,
-            min_detection_confidence=0.5,
-            min_tracking_confidence=0.5,
-        )
-        self.hands = mp.solutions.hands.Hands(
-            static_image_mode=False,
-            max_num_hands=2,
-            min_detection_confidence=0.5,
-            min_tracking_confidence=0.5,
-        )
-        self.drawing = mp.solutions.drawing_utils
-        self.recognizer = HandGestureRecognizer()
-        self.candidate_gesture = None
-        self.candidate_frames = 0
-        self.active_gesture = None
-        self.required_stable_frames = 3
-        if video_path is None:
-            project_root = Path(__file__).resolve().parent.parent
-            video_path = project_root / "data" / "test_videos" / "diem_archive_tanner.mp4"
-        self.video_overlay = OneShotVideoOverlay(video_path)
-
-    def read(self):
-        success, frame = self.capture.read()
-        if not success:
-            return None
-
-        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        pose_result = self.pose.process(frame_rgb)
-        face_result = self.face_mesh.process(frame_rgb)
-        hand_result = self.hands.process(frame_rgb)
-
-        if self.show_landmarks and face_result.multi_face_landmarks:
-            self.drawing.draw_landmarks(
-                image=frame,
-                landmark_list=face_result.multi_face_landmarks[0],
-                connections=mp.solutions.face_mesh.FACEMESH_TESSELATION,
-                landmark_drawing_spec=self.drawing.DrawingSpec(
-                    color=(80, 220, 80), thickness=1, circle_radius=1
-                ),
-                connection_drawing_spec=self.drawing.DrawingSpec(
-                    color=(80, 120, 80), thickness=1, circle_radius=1
-                ),
-            )
-
-        if self.show_landmarks and pose_result.pose_landmarks:
-            self.drawing.draw_landmarks(
-                image=frame,
-                landmark_list=pose_result.pose_landmarks,
-                connections=mp.solutions.pose.POSE_CONNECTIONS,
-            )
-
-        detected_hands = hand_result.multi_hand_landmarks or []
-        detected_gesture = None
-        frame_height, frame_width = frame.shape[:2]
-        for hand_landmarks in detected_hands:
-            if self.show_landmarks:
-                self.drawing.draw_landmarks(
-                    image=frame,
-                    landmark_list=hand_landmarks,
-                    connections=mp.solutions.hands.HAND_CONNECTIONS,
-                )
-            image_landmarks = [
-                {"x": landmark.x * frame_width, "y": landmark.y * frame_height}
-                for landmark in hand_landmarks.landmark
-            ]
-            features = extract_hand_features(image_landmarks)
-            gesture = self.recognizer.recognize(features["finger_extended"])
-            if gesture is not None:
-                detected_gesture = gesture
-                break
-
-        if self._update_gesture_state(detected_gesture):
-            self.video_overlay.start()
-        self.video_overlay.overlay_next_frame(frame)
-        self._draw_status(frame, detected_hands)
-        return frame
-
-    def _update_gesture_state(self, detected_gesture):
-        previous_gesture = self.active_gesture
-        if detected_gesture != self.candidate_gesture:
-            self.candidate_gesture = detected_gesture
-            self.candidate_frames = 1
-        else:
-            self.candidate_frames += 1
-
-        if self.candidate_frames >= self.required_stable_frames:
-            self.active_gesture = self.candidate_gesture
-        return (
-            self.active_gesture == "pointing_fist"
-            and previous_gesture != "pointing_fist"
-        )
-
-    def _draw_status(self, frame, detected_hands):
-        if self.active_gesture:
-            text = f"Gesture recognized: {self.active_gesture}"
-            color = (40, 220, 40)
-        elif detected_hands:
-            text = "Hand detected - make pointing_fist"
-            color = (0, 220, 255)
-        else:
-            text = "Show a hand to the camera"
-            color = (240, 240, 240)
-
-        cv2.rectangle(frame, (12, 12), (660, 58), (20, 20, 20), -1)
-        cv2.putText(
-            frame,
-            text,
-            (24, 44),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.8,
-            color,
-            2,
-            cv2.LINE_AA,
-        )
-        cv2.putText(
-            frame,
-            "Press q to quit",
-            (24, frame.shape[0] - 18),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.55,
-            (255, 255, 255),
-            1,
-            cv2.LINE_AA,
-        )
-
-    def release(self):
-        self.video_overlay.stop()
-        self.capture.release()
-        self.pose.close()
-        self.face_mesh.close()
-        self.hands.close()
-        cv2.destroyAllWindows()
+from .live_capture import LiveLandmarkCapture
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Show live MediaPipe landmarks and recognize a pointing_fist hand pose."
+        description="Show live MediaPipe landmarks and recognize hand and face gestures."
     )
     parser.add_argument(
         "--camera",
@@ -293,6 +62,16 @@ def main():
         )
 
     virtual_camera = None
+    command_queue = Queue()
+
+    def read_commands():
+        while True:
+            try:
+                command = input().strip().lower()
+            except EOFError:
+                return
+            command_queue.put(command)
+
     try:
         if args.virtual_camera:
             camera_width = int(app.capture.get(cv2.CAP_PROP_FRAME_WIDTH)) or args.width
@@ -314,11 +93,36 @@ def main():
                 f"({camera_width}x{camera_height} at {args.fps:g} FPS)."
             )
         if args.preview:
-            print("Local preview enabled. Press 'q' in the preview window to quit.")
+            print("Local preview enabled. Press 'q' to quit or 'm' to toggle meme triggers.")
         elif args.virtual_camera:
             print("Virtual camera output active. Press Ctrl+C to stop.")
+        print(
+            "Terminal commands: 'stop recognition', 'start recognition', "
+            "or 'toggle recognition'."
+        )
+        Thread(target=read_commands, daemon=True).start()
 
         while True:
+            while True:
+                try:
+                    command = command_queue.get_nowait()
+                except Empty:
+                    break
+
+                if command in ("stop", "stop recognition", "pause recognition"):
+                    app.set_gesture_recognition_enabled(False)
+                elif command in ("start", "start recognition", "resume recognition"):
+                    app.set_gesture_recognition_enabled(True)
+                elif command in ("toggle", "toggle recognition"):
+                    app.set_gesture_recognition_enabled(
+                        not app.gesture_recognition_enabled
+                    )
+                else:
+                    print("Unknown command. Use 'stop recognition', 'start recognition', or 'toggle recognition'.")
+                    continue
+                state = "enabled" if app.gesture_recognition_enabled else "paused"
+                print(f"Meme recognition {state}; camera output continues.")
+
             frame = app.read()
             if frame is None:
                 print("[ERROR] Could not read a frame from the camera.")
@@ -332,8 +136,15 @@ def main():
                 virtual_camera.sleep_until_next_frame()
             if args.preview:
                 cv2.imshow("Live Hand Gesture Demo", frame)
-                if cv2.waitKey(1) & 0xFF == ord("q"):
+                key = cv2.waitKey(1) & 0xFF
+                if key == ord("q"):
                     break
+                if key == ord("m"):
+                    app.set_gesture_recognition_enabled(
+                        not app.gesture_recognition_enabled
+                    )
+                    state = "enabled" if app.gesture_recognition_enabled else "paused"
+                    print(f"Meme recognition {state}; camera output continues.")
     except KeyboardInterrupt:
         print("\nInterrupted by user.")
     finally:
